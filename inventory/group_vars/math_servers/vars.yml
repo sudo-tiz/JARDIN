@@ -1,0 +1,3 @@
+---
+dns_resolver_immutable: true
+system_timezone_name: Europe/Paris

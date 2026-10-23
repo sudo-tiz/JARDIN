@@ -1,0 +1,12 @@
+########################################################################
+#                                                                      #
+# wg-easy                                                              #
+#                                                                      #
+########################################################################
+
+wg_easy_enabled: true
+
+wg_easy_hostname: "{{ wg_easy_hostname_label }}.{{ my_domain }}"
+
+wg_easy_environment_variables_additional_variable_init_username: "{{ wg_easy_init_username_private }}"
+wg_easy_environment_variables_additional_variable_init_password: "{{ vault_wg_easy_environment_variables_additional_variable_init_password }}"

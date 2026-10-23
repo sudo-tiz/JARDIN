@@ -1,0 +1,108 @@
+---
+mash_playbook_generic_secret_key: "{{ vault_mash_playbook_generic_secret_key }}"
+ansible_python_interpreter: "/usr/bin/python3"
+devture_playbook_state_preserver_enabled: false
+system_swap_enabled: true
+devture_timesync_installation_enabled: false
+
+########################################################################
+#                                                                      #
+# ssh                                                                  #
+#                                                                      #
+########################################################################
+
+system_security_ssh_enabled: true
+system_security_ssh_allow_tcp_forwarding: true
+system_security_ssh_password_authentication: false
+system_security_ssh_permit_root_login: false
+
+########################################################################
+#                                                                      #
+# Fail2Ban                                                             #
+#                                                                      #
+########################################################################
+
+system_security_fail2ban_enabled: true
+system_security_fail2ban_sshd_port: "{{ system_security_ssh_port }}"
+#NOTE: some are missing and some of them are send by aux role: vaultwarden
+system_security_fail2ban_configuration_extension: |
+  backend = systemd
+  filter = sshd[journalmatch='_SYSTEMD_UNIT=ssh.service']
+  banaction = %(banaction_allports)s
+
+########################################################################
+#                                                                      #
+# endlessh                                                             #
+#                                                                      #
+########################################################################
+endlessh_enabled: false
+endlessh_container_extra_arguments_custom:
+  - "-enable_prometheus"
+  - "-geoip_supplier=ip-api"
+
+########################################################################
+#                                                                      #
+# Docker                                                               #
+#                                                                      #
+########################################################################
+
+mash_playbook_docker_installation_enabled: true
+devture_docker_sdk_for_python_installation_enabled: true
+# docker_daemon_options: { "metrics-addr": "127.0.0.1:8092" }
+
+########################################################################
+#                                                                      #
+# backup-borg                                                          #
+#                                                                      #
+########################################################################
+
+backup_borg_enabled: true
+backup_borg_systemd_required_services_list:
+  - "docker.service"
+backup_borg_schedule: "*-*-* 05:00:00"
+backup_borg_ssh_key_private: " "
+backup_borg_location_repositories:
+  - /mnt/mash-backup
+backup_borg_container_extra_arguments:
+  - "--mount type=bind,src=/mnt/backup/mash-backup/,dst=/mnt/mash-backup/"
+backup_borg_storage_encryption_passphrase: "{{ vault_backup_borg_storage_encryption_passphrase }}"
+
+########################################################################
+#                                                                      #
+# devture-traefik                                                      #
+#                                                                      #
+########################################################################
+
+mash_playbook_reverse_proxy_type: playbook-managed-traefik
+traefik_config_certificatesResolvers_acme_enabled: true
+traefik_config_metrics_prometheus_enabled: false
+# traefik_config_entrypoint_metrics_port: 9082
+
+########################################################################
+#                                                                      #
+# devture-postgres                                                     #
+#                                                                      #
+########################################################################
+
+postgres_enabled: true
+postgres_connection_password: "{{ vault_postgres_connection_password }}"
+
+########################################################################
+#                                                                      #
+# exim_relay                                                           #
+#                                                                      #
+########################################################################
+
+exim_relay_enabled: true
+exim_relay_hostname: "{{ my_domain }}"
+exim_relay_sender_address: "admin@{{ exim_relay_hostname }}"
+# NOTE:
+# exim_relay_relay_use: true
+# exim_relay_relay_host_name: "{{ exim_relay_relay_host_name_private }}"
+# exim_relay_relay_host_port: 465
+# exim_relay_relay_auth: true
+# exim_relay_relay_auth_username: "{{ vault_exim_relay_relay_auth_username }}"
+# exim_relay_relay_auth_password: "{{ vault_exim_relay_relay_auth_password }}"
+
+exim_relay_container_extra_arguments:
+  - '-p 127.0.0.1:25:8025'

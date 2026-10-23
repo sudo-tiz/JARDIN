@@ -1,0 +1,11 @@
+# Local credentials and inventory
+/inventory/hosts
+/inventory/host_vars/
+/vault_pass
+/mash-playbook/inventory/
+/mash-playbook/group_vars/
+/math-playbook/inventory/
+
+# Local Vault files
+**/vault.yml
+**/vault.yaml

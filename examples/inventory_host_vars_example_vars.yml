@@ -1,0 +1,43 @@
+---
+ansible_host: server.example.invalid
+ansible_port: 22
+ansible_ssh_user: example-user
+ansible_ssh_private_key_file: ~/.ssh/example
+my_domain: example.invalid
+system_security_ssh_port: "{{ ansible_port }}"
+nextcloud_hostname_label: cloud
+collabora_online_hostname_label: office
+vaultwarden_hostname_label: vault
+languagetool_hostname_label: languagetool
+forgejo_hostname_label: git
+jellyfin_hostname_label: jellyfin
+seerr_hostname_label: seerr
+jackett_hostname_label: jackett.local
+sonarr_hostname_label: sonarr
+radarr_hostname_label: radarr
+bazarr_hostname_label: bazarr.local
+lidarr_hostname_label: lidarr
+qbittorrent_hostname_label: qbittorrent.local
+grafana_hostname_label: grafana.local
+wg_easy_hostname_label: wg-easy
+vaultwarden_path_prefix_private: replace-with-private-path
+languagetool_path_prefix_private: replace-with-private-path
+grafana_default_admin_user_private: admin
+wg_easy_init_username_private: admin
+forgejo_ssh_port_private: 2222
+
+fast_linux_config_users:
+  - example-user
+  - root
+fast_linux_config_version: d3aef251e1d1d5ad5078e273d17a03f870001ebf
+msmtp_relay_from: server@example.invalid
+system_mail_recipient: admin@example.invalid
+fstab_mounts_entries:
+  - src: /dev/disk/by-label/MEDIA
+    path: /mnt/media
+    owner: 999
+    group: 1001
+    mode: "0777"
+  - src: /dev/disk/by-label/BACKUP
+    path: /mnt/backup
+    mode: "0700"

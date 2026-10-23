@@ -1,0 +1,103 @@
+---
+########################################################################
+#                                                                      #
+# nextcloud                                                            #
+#                                                                      #
+########################################################################
+
+nextcloud_enabled: true
+nextcloud_hostname: "{{ nextcloud_hostname_label }}.{{ my_domain }}"
+nextcloud_database_type: "postgres"
+nextcloud_floc_optout_enabled: false
+nextcloud_hsts_preload_enabled: true
+nextcloud_app_autoupdate_enabled: true
+nextcloud_preview_enabled: true
+nextcloud_preview_preview_max_x: 2560
+nextcloud_preview_preview_max_y: 2560
+nextcloud_container_image_customizations_ffmpeg_installation_enabled: true
+nextcloud_container_image_customizations_packages_to_install_custom:
+  - "libbz2-dev"
+nextcloud_systemd_wanted_services_list_custom:
+  - "mash-nextcloud-logger"
+nextcloud_config_parameters_custom:
+  - key: auth.bruteforce.protection.enabled
+    value: true
+    type: boolean
+  - key: loglevel
+    value: 1
+    type: int
+  - key: logfile_audit
+    value: /var/www/html/data/nextcloud.log
+    type: string
+
+# I removed collabora for now
+# nextcloud_app_richdocuments_wopi_client_url: "{{ collabora_online_url }}"
+
+#NOTE: ajouter application à la mano ? admin_audit,
+# otherwise use :  docker exec mash-nextcloud-server php /var/www/html/occ
+
+#NOTE: make sure memories doesn't needs that
+# nextcloud_container_additional_mounts:
+#   - "type=tmpfs,destination=/tmp:exec"
+
+########################################################################
+#                                                                      #
+# collabora-online                                                     #
+#                                                                      #
+########################################################################
+
+collabora_online_enabled: false
+collabora_online_hostname: "{{ collabora_online_hostname_label }}.{{ my_domain }}"
+# A password for the admin interface, available at: https://COLLABORA_ONLINE_DOMAIN/browser/dist/admin/admin.html
+collabora_online_environment_variable_password: "{{ vault_collabora_online_environment_variable_password }}"
+collabora_online_environment_variable_aliasgroup1: "https://{{ nextcloud_hostname | replace('.', '\\.') }}:443"
+
+########################################################################
+#                                                                      #
+# vaultwarden                                                          #
+#                                                                      #
+########################################################################
+
+vaultwarden_enabled: true
+vaultwarden_hostname: "{{ vaultwarden_hostname_label }}.{{ my_domain }}"
+vaultwarden_path_prefix: "{{ vaultwarden_path_prefix_private }}"
+vaultwarden_floc_optout_enabled: false
+vaultwarden_hsts_preload_enabled: true
+# Acces to /admin
+vaultwarden_config_admin_token: "{{ vault_vaultwarden_config_admin_token }}"
+# Require people to validate their email addresses. When enabled, SMTP settings (below) are required.
+vaultwarden_config_signups_verify: true
+vaultwarden_environment_variables_smtp_from: "vaultwarden@{{ exim_relay_hostname }}"
+
+########################################################################
+#                                                                      #
+# LanguageTool                                                         #
+#                                                                      #
+########################################################################
+
+languagetool_enabled: false
+languagetool_hostname: "{{ languagetool_hostname_label }}.{{ my_domain }}"
+languagetool_path_prefix: "{{ languagetool_path_prefix_private }}"
+languagetool_floc_optout_enabled: false
+languagetool_hsts_preload_enabled: true
+languagetool_ngrams_enabled: true
+languagetool_ngrams_langs_enabled: ["fr", "en"]
+languagetool_container_health_interval: "20s"
+# languagetool_uid: '100'
+# languagetool_gid: '101'
+# languagetool_container_extra_arguments:
+#  - "-e langtool_prometheusMonitoring=true"
+#  - "-e langtool_prometheusPort=9301"
+#  - "-e langtool_logIp=true"
+
+########################################################################
+#                                                                      #
+# forgejo                                                              #
+#                                                                      #
+########################################################################
+
+forgejo_enabled: false
+forgejo_hostname: "{{ forgejo_hostname_label }}.{{ my_domain }}"
+forgejo_floc_optout_enabled: false
+forgejo_hsts_preload_enabled: true
+forgejo_ssh_port: "{{ forgejo_ssh_port_private }}"

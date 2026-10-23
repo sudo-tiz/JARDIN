@@ -1,0 +1,184 @@
+---
+########################################################################
+#                                                                      #
+# grafana                                                              #
+#                                                                      #
+########################################################################
+
+grafana_enabled: true
+grafana_hostname: "{{ grafana_hostname_label }}"
+grafana_container_http_host_bind_port: 127.0.0.1:8090
+grafana_default_admin_user: "{{ grafana_default_admin_user_private }}"
+grafana_default_admin_password: "{{ vault_grafana_default_admin_password }}"
+
+grafana_environment_variables_additional_variables: |
+  GF_SMTP_ENABLED=true
+  GF_SMTP_HOST={{ exim_relay_identifier }}:8025
+  GF_SMTP_FROM_ADDRESS=grafana@{{ exim_relay_hostname }}
+  GF_SMTP_FROM_NAME=Grafana
+  GF_ANALYTICS_REPORTING_ENABLED=false
+
+grafana_provisioning_datasources_datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: "http://{{ prometheus_identifier }}:9090"
+  - name: Loki
+    type: loki
+    access: proxy
+    url: "http://{{ loki_identifier }}:3100"
+    jsonData:
+      httpHeaderName1: X-Scope-OrgID
+    secureJsonData:
+      httpHeaderValue1: "mash"
+
+grafana_container_additional_networks_custom:
+  - "{{ prometheus_container_network }}"
+  - "{{ loki_container_network }}"
+  - "{{ exim_relay_container_network }}"
+
+grafana_dashboard_download_urls:
+  - "{{ prometheus_node_exporter_dashboard_urls }}"
+grafana_provisioning_dashboard_template_files:
+  - name: "ssh.json"
+    path: "grafana/dashboards/ssh.json.j2"
+  - name: "nextcloud.json"
+    path: "grafana/dashboards/nextcloud.json.j2"
+  - name: "backup.json"
+    path: "grafana/dashboards/backup.json.j2"
+  - name: "traefik.json"
+    path: "grafana/dashboards/traefik.json.j2"
+  - name: "endlessh.json"
+    path: "grafana/dashboards/endlessh.json.j2"
+  # - name: "cadvisor.json"
+  #   path: "grafana/dashboards/cadvisor.json.j2"
+grafana_provisioning_alerting_template_files:
+  - name: "rules.yml"
+    path: "grafana/alerting/rules.yml.j2"
+  - name: "contact.yml"
+    path: "grafana/alerting/contact.yml"
+  - name: "policies.yml"
+    path: "grafana/alerting/policies.yml"
+
+grafana_floc_optout_enabled: false
+grafana_hsts_preload_enabled: true
+
+########################################################################
+#                                                                      #
+# Prometheus                                                           #
+#                                                                      #
+########################################################################
+
+prometheus_enabled: true
+# scrape itself
+prometheus_self_process_scraper_enabled: false
+
+# node-exporter
+prometheus_self_node_scraper_enabled: true
+prometheus_self_node_scraper_static_configs_target: "{{ prometheus_node_exporter_identifier }}:9100"
+
+prometheus_container_http_host_bind_port: 127.0.0.1:8091
+
+prometheus_config_scrape_configs_additional:
+  - job_name: traefik
+    scrape_interval: 20s
+    scrape_timeout: 20s
+    static_configs:
+      - targets: ["{{ traefik_identifier }}:9082"]
+  # - job_name: docker
+  #   scrape_interval: 20s
+  #   scrape_timeout: 20s
+  #   static_configs:
+  #     - targets: ["host.docker.internal:8092"]
+  # - job_name: endlessh
+  #   scrape_interval: 20s
+  #   scrape_timeout: 20s
+  #   static_configs:
+  #     - targets: ["{{ endlessh_identifier }}:2112"]
+  # - job_name: languagetool
+  #   scrape_interval: 20s
+  #   scrape_timeout: 20s
+  #   static_configs:
+  #     - targets: ["{{ languagetool_identifier }}:9301"]
+  # - job_name: cadvisor
+  #   scrape_interval: 5s
+  #   scrape_timeout: 5s
+  #   static_configs:
+  #     - targets: ["{{ cadvisor_identifier }}:8080"]
+
+prometheus_container_additional_networks:
+  - "{{ prometheus_node_exporter_container_network }}"
+  - "{{ traefik_container_network }}"
+  # - "{{ endlessh_container_network }}"
+  # - "{{ languagetool_container_network }}"
+  # - "{{ cadvisor_container_network }}"
+
+# prometheus_container_extra_arguments:
+#   - "--add-host host.docker.internal=host-gateway"
+
+########################################################################
+#                                                                      #
+# cadvisor                                                             #
+#                                                                      #
+########################################################################
+# cadvisor_enabled: false
+# cadvisor_process_extra_arguments_custom:
+#   - "--enable_metrics=cpu,disk,memory,network"
+#   - "-housekeeping_interval=10s"
+#   - "-docker_only=true"
+#
+# cadvisor_container_extra_arguments:
+#   - "--mount type=bind,source=/sys,destination=/sys,readonly"
+#   - "--mount type=bind,source=/var/lib/docker/,destination=/var/lib/docker,readonly"
+
+########################################################################
+#                                                                      #
+# prometheus-node-exporter                                             #
+#                                                                      #
+########################################################################
+
+prometheus_node_exporter_enabled: true
+
+prometheus_node_exporter_process_extra_arguments:
+  - "--collector.filesystem"
+  - "--collector.cpu"
+  - "--collector.meminfo"
+  - "--collector.powersupplyclass"
+  - "--collector.stat"
+  - "--collector.uname"
+#   - "--collector.disable-defaults"
+
+prometheus_node_exporter_container_extra_arguments:
+  - "--security-opt apparmor=unconfined"
+  - "--mount type=bind,src=/var/run/dbus/system_bus_socket,dst=/var/run/dbus/system_bus_socket,ro,bind-propagation=rslave"
+
+########################################################################
+#                                                                      #
+# loki                                                                 #
+#                                                                      #
+########################################################################
+
+loki_enabled: true
+loki_configuration_extension_yaml: |
+  query_scheduler:
+    max_outstanding_requests_per_tenant: 4096
+  frontend:
+    max_outstanding_per_tenant: 4096
+  query_range:
+    parallelise_shardable_queries: true
+  limits_config:
+    split_queries_by_interval: 15m
+    max_query_parallelism: 32
+
+########################################################################
+#                                                                      #
+# promtail                                                                 #
+#                                                                      #
+########################################################################
+
+promtail_enabled: true
+promtail_journald_scraper_enabled: true
+promtail_journald_scraper_host_path: /var/log/journal
+promtail_journald_scraper_in_container_path: /promlog/journal
+promtail_journald_scraper_config_relabel_configs_drop_regex: '{{ promtail_identifier }}\.service'
+promtail_journald_scraper_config_relabel_configs_keep_regex: 'ssh\.service|fail2ban\.service|mash-.*'
