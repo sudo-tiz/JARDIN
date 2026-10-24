@@ -4,7 +4,7 @@
 ![just](https://img.shields.io/badge/just-task_runner-orange)
 ![Debian](https://img.shields.io/badge/Debian-A81D33?logo=debian&logoColor=white)
 
-Ansible setup for a small self-hosted server, driven by one `justfile` and one shared inventory.
+Ansible self-hosting for a small server, driven by one `justfile` and one shared inventory.
 
 ```
 JARDIN                     just + shared inventory
@@ -39,7 +39,7 @@ Both are Git submodules.
 | `math_servers` | math hosts |
 | `vm_hosts`, `vms`, `firewall_hosts` | KVM VMs and firewall |
 
-## Getting started
+## Quick start
 
 Requires `just`, the Ansible community package and `uv`.
 
@@ -64,7 +64,11 @@ just math-run-tags <tag>
 just periodic-update
 ```
 
-Roles: [`math-playbook/README.md`](math-playbook/README.md).
-
 > [!WARNING]
 > Playbooks change real machines: use `--check` and `--limit` first.
+
+## Related
+
+- [math-playbook](https://github.com/sudo-Tiz/math-playbook) — roles for what MASH doesn't cover
+- [LARBUSTE](https://github.com/sudo-Tiz/LARBUSTE) — dotfiles, applied by the `larbuste` role
+- [LARBRE](https://github.com/sudo-Tiz/LARBRE) — Arch Linux auto-setup
