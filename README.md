@@ -5,7 +5,7 @@ Ansible setup for a small self-hosted server, driven by one `justfile` and one s
 - [`mash-playbook/`](https://github.com/mother-of-all-self-hosting/mash-playbook): upstream MASH (Docker, Traefik, PostgreSQL, borg, self-hosted services). Never edited here.
 - [`math-playbook/`](math-playbook/README.md): our roles for what MASH doesn't cover (host setup, mail relay, APT upgrades, firewall, KVM VMs).
 
-Both are Git submodules. By [The Immutable Zero (sudo-Tiz)](https://github.com/sudo-Tiz).
+Both are Git submodules. 
 
 ## Layout
 
