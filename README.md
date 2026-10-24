@@ -1,11 +1,21 @@
 # Server playbooks
 
+![Ansible](https://img.shields.io/badge/Ansible-EE0000?logo=ansible&logoColor=white)
+![just](https://img.shields.io/badge/just-task_runner-orange)
+![Debian](https://img.shields.io/badge/Debian-A81D33?logo=debian&logoColor=white)
+
 Ansible setup for a small self-hosted server, driven by one `justfile` and one shared inventory.
 
-- [`mash-playbook/`](https://github.com/mother-of-all-self-hosting/mash-playbook): upstream MASH (Docker, Traefik, PostgreSQL, borg, self-hosted services). Never edited here.
-- [`math-playbook/`](math-playbook/README.md): our roles for what MASH doesn't cover (host setup, mail relay, APT upgrades, firewall, KVM VMs).
+```
+server                     just + shared inventory
+ ├─ mash-playbook            services: Docker, Traefik, PostgreSQL, borg…
+ └─ math-playbook            host setup, firewall, mail relay, APT, KVM VMs
+```
 
-Both are Git submodules. 
+- [`mash-playbook/`](https://github.com/mother-of-all-self-hosting/mash-playbook): upstream MASH. Never edited here.
+- [`math-playbook/`](math-playbook/README.md): our roles for what MASH doesn't cover.
+
+Both are Git submodules.
 
 ## Layout
 
@@ -19,16 +29,29 @@ Both are Git submodules.
 
 `just sync-inventory` copies `inventory/` into both playbooks before every recipe. Don't edit the copies.
 
-Groups: `base`, `database`, `backup`, `home`, `media`, `supervision`, `vpn` (MASH services, children of `mash_servers`); `math_servers` (math hosts); `vm_hosts`, `vms`, `firewall_hosts` (VMs and firewall). `group_vars` hold formulas (`{{ x_hostname_label }}.{{ my_domain }}`), `host_vars` the private values.
+`group_vars` hold formulas (`{{ x_hostname_label }}.{{ my_domain }}`), `host_vars` the private values.
+
+## Groups
+
+| Group | Runs |
+|-------|------|
+| `base`, `database`, `backup`, `home`, `media`, `supervision`, `vpn` | MASH services (children of `mash_servers`) |
+| `math_servers` | math hosts |
+| `vm_hosts`, `vms`, `firewall_hosts` | KVM VMs and firewall |
 
 ## Getting started
 
-1. Install `just`, the Ansible community package and `uv`.
-2. `git clone --recurse-submodules <url>`.
-3. Copy `examples/inventory_hosts` to `inventory/hosts` and `examples/inventory_host_vars_example_vars.yml` to `inventory/host_vars/<host>/vars.yml`; edit them.
-4. Create and encrypt the `vault.yml` files with the `vault_*` variables the `group_vars` reference.
-5. Put the Vault password in `vault_pass` (mode `0600`).
-6. Check first: `just --dry-run <recipe>`.
+Requires `just`, the Ansible community package and `uv`.
+
+```sh
+git clone --recurse-submodules <url> && cd server
+cp examples/inventory_hosts inventory/hosts
+mkdir -p inventory/host_vars/<host>
+cp examples/inventory_host_vars_example_vars.yml inventory/host_vars/<host>/vars.yml
+# edit both, create + encrypt the vault.yml files with the vault_* variables
+install -m 0600 /dev/null vault_pass   # then put the Vault password in it
+just --dry-run <recipe>
+```
 
 ## Recipes
 
@@ -41,4 +64,7 @@ just math-run-tags <tag>
 just periodic-update
 ```
 
-Roles: [`math-playbook/README.md`](math-playbook/README.md). Playbooks change real machines: use `--check` and `--limit` first.
+Roles: [`math-playbook/README.md`](math-playbook/README.md).
+
+> [!WARNING]
+> Playbooks change real machines: use `--check` and `--limit` first.
