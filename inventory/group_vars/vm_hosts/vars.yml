@@ -1,0 +1,12 @@
+---
+# One Traefik router per VM of this hypervisor, TLS terminated here (HTTP-01), plain HTTP to the VM.
+traefik_provider_configuration_extension_yaml: |
+  {% set routers = {} %}
+  {% set services = {} %}
+  {% for vm in groups['vms'] | default([]) %}
+  {% if hostvars[vm].vm_hypervisor == inventory_hostname %}
+  {% set _ = routers.update({vm: {'rule': hostvars[vm].vm_router_rule, 'entryPoints': [traefik_entrypoint_primary], 'service': vm, 'tls': {'certResolver': traefik_certResolver_primary}}}) %}
+  {% set _ = services.update({vm: {'loadBalancer': {'servers': [{'url': hostvars[vm].vm_upstream}]}}}) %}
+  {% endif %}
+  {% endfor %}
+  {{ {'http': {'routers': routers, 'services': services}} | to_json }}

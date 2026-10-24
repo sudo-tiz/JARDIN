@@ -1,0 +1,25 @@
+---
+# Hosts of a hypervisor (group priority 10 in `hosts` so these override `base`). Each VM sets in its host_vars: vm_hypervisor, vm_user, vm_network, vm_ip,
+# my_domain and vm_public_hostnames (literals or local formulas: the hypervisor reads them across hosts).
+
+########## common (mash + math) ##########
+ansible_host: "{{ vm_ip }}"
+ansible_port: 22
+ansible_ssh_user: "{{ vm_user }}"
+ansible_ssh_private_key_file: "{{ hostvars[vm_hypervisor].ansible_ssh_private_key_file }}"
+ansible_ssh_common_args: >-
+  -o ProxyCommand="ssh -W %h:%p -p {{ hostvars[vm_hypervisor].ansible_port }}
+  -i {{ hostvars[vm_hypervisor].ansible_ssh_private_key_file }}
+  {{ hostvars[vm_hypervisor].ansible_ssh_user }}@{{ hostvars[vm_hypervisor].ansible_host }}"
+system_security_ssh_authorizedkeys_host: "{{ hostvars[vm_hypervisor].system_security_ssh_authorizedkeys_host }}"
+
+########## mash ##########
+# Plain HTTP behind the Traefik of the hypervisor, which terminates TLS.
+traefik_config_entrypoint_web_secure_enabled: false
+traefik_config_entrypoint_web_forwardedHeaders_trustedIPs:
+  - "{{ (hostvars[vm_hypervisor].libvirt_vm_networks | selectattr('name', 'equalto', vm_network) | first).address | split('/') | first }}/32"
+backup_borg_enabled: false
+postgres_enabled: false
+# Read by the hypervisor to route the VM hostnames.
+vm_router_rule: "{{ vm_public_hostnames | map('regex_replace', '^', 'Host(`') | map('regex_replace', '$', '`)') | join(' || ') }}"
+vm_upstream: "http://{{ vm_ip }}:80"

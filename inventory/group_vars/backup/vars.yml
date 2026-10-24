@@ -1,0 +1,17 @@
+---
+########################################################################
+#                                                                      #
+# backup-borg                                                          #
+#                                                                      #
+########################################################################
+
+backup_borg_enabled: true
+backup_borg_systemd_required_services_list:
+  - "docker.service"
+backup_borg_schedule: "*-*-* 05:00:00"
+backup_borg_ssh_key_private: " "
+backup_borg_location_repositories:
+  - /mnt/mash-backup
+backup_borg_container_extra_arguments:
+  - "--mount type=bind,src={{ mash_backup_dir }}/,dst=/mnt/mash-backup/"
+backup_borg_storage_encryption_passphrase: "{{ vault_backup_borg_storage_encryption_passphrase }}"

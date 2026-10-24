@@ -3,14 +3,17 @@
 # jellyfin                                                             #
 #                                                                      #
 ########################################################################
+media_domain: "media.{{ my_domain }}"
+vm_public_hostnames: "{{ [jellyfin_hostname, seerr_hostname, sonarr_hostname, radarr_hostname] + ([lidarr_hostname] if lidarr_enabled else []) }}"
+
 jellyfin_enabled: true
 jellyfin_uid: "0"
 jellyfin_gid: "0"
-jellyfin_hostname: "{{ jellyfin_hostname_label }}.{{ my_domain }}"
+jellyfin_hostname: "{{ jellyfin_hostname_label }}.{{ media_domain }}"
 # Optional custom Traefik rules can reference jellyfin_hostname.
 jellyfin_container_additional_volumes:
   - type: bind
-    src: /mnt/media
+    src: "{{ media_path }}"
     dst: /media
 
 # No basic auth
@@ -26,7 +29,7 @@ jellyfin_gpu_bind_path: "{{ jellyfin_gpu_path }}"
 #                                                                      #
 ########################################################################
 seerr_enabled: true
-seerr_hostname: "{{ seerr_hostname_label }}.{{ my_domain }}"
+seerr_hostname: "{{ seerr_hostname_label }}.{{ media_domain }}"
 seerr_container_additional_networks_custom:
  - "{{ exim_relay_container_network }}"
 
@@ -36,7 +39,7 @@ seerr_container_additional_networks_custom:
 #                                                                      #
 ########################################################################
 jackett_enabled: true
-jackett_container_http_host_bind_port: 127.0.0.1:8081
+jackett_container_http_host_bind_port: "{{ local_bind }}:8081"
 jackett_hostname: "{{ jackett_hostname_label }}"
 jackett_container_labels_traefik_enabled: false
 
@@ -56,10 +59,10 @@ flaresolverr_container_labels_traefik_enabled: false
 sonarr_enabled: true
 # sonarr_container_http_bind_port: 127.0.0.1:8082
 # sonarr_container_labels_traefik_enabled: false
-sonarr_hostname: "{{ sonarr_hostname_label }}.{{ my_domain }}"
+sonarr_hostname: "{{ sonarr_hostname_label }}.{{ media_domain }}"
 sonarr_container_additional_volumes:
   - type: bind
-    src: /mnt/media/serie
+    src: "{{ media_series_path }}"
     dst: /series
   - type: bind
     src: "{{ qbittorrent_base_path }}/downloads"
@@ -73,10 +76,10 @@ sonarr_container_additional_volumes:
 radarr_enabled: true
 # radarr_container_http_bind_port: 127.0.0.1:8083
 # radarr_container_labels_traefik_enabled: false
-radarr_hostname: "{{ radarr_hostname_label }}.{{ my_domain }}"
+radarr_hostname: "{{ radarr_hostname_label }}.{{ media_domain }}"
 radarr_container_additional_volumes:
   - type: bind
-    src: /mnt/media/film
+    src: "{{ media_movies_path }}"
     dst: /movies
   - type: bind
     src: "{{ qbittorrent_base_path }}/downloads"
@@ -89,14 +92,14 @@ radarr_container_additional_volumes:
 ########################################################################
 bazarr_enabled: true
 bazarr_hostname: "{{ bazarr_hostname_label }}"
-bazarr_container_http_host_bind_port: 127.0.0.1:8087 # to change
+bazarr_container_http_host_bind_port: "{{ local_bind }}:8087" # to change
 bazarr_container_labels_traefik_enabled: false
 bazarr_container_additional_volumes_custom:
   - type: bind
-    src: /mnt/media/film
+    src: "{{ media_movies_path }}"
     dst: /movies
   - type: bind
-    src: /mnt/media/serie
+    src: "{{ media_series_path }}"
     dst: /series
 
 bazarr_container_additional_networks_custom:
@@ -110,8 +113,8 @@ bazarr_container_additional_networks_custom:
 #                                                                      #
 ########################################################################
 lidarr_enabled: false
-lidarr_hostname: "{{ lidarr_hostname_label }}.{{ my_domain }}"
-# lidarr_container_http_host_bind_port: 127.0.0.1:8087
+lidarr_hostname: "{{ lidarr_hostname_label }}.{{ media_domain }}"
+# lidarr_container_http_host_bind_port: "{{ local_bind }}:8088"
 # lidarr_container_labels_traefik_enabled: false
 lidarr_container_additional_volumes_custom:
   - type: bind
@@ -129,11 +132,11 @@ lidarr_container_additional_volumes_custom:
 ########################################################################
 
 qbittorrent_enabled: true
-qbittorrent_container_http_host_bind_port: 127.0.0.1:8085
+qbittorrent_container_http_host_bind_port: "{{ local_bind }}:8085"
 qbittorrent_hostname: "{{ qbittorrent_hostname_label }}"
 qbittorrent_container_labels_traefik_enabled: false
 qbittorrent_download_path: "{{ qbittorrent_base_path }}/downloads"
 qbittorrent_container_additional_volumes:
   - type: bind
-    src: /mnt/media/film
+    src: "{{ media_movies_path }}"
     dst: /media

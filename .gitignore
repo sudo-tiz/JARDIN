@@ -2,6 +2,7 @@
 /inventory/hosts
 /inventory/host_vars/
 /vault_pass
+/*.tar.gz
 /mash-playbook/inventory/
 /mash-playbook/group_vars/
 /math-playbook/inventory/

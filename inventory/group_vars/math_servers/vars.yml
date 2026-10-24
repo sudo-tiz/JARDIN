@@ -1,3 +1,11 @@
 ---
 dns_resolver_immutable: true
 system_timezone_name: Europe/Paris
+fast_linux_config_users:
+  - "{{ ansible_ssh_user }}"
+  - root
+fast_linux_config_version: main
+system_mail_recipient: ""
+msmtp_relay_host: "{{ mail_relay_host }}"
+msmtp_relay_port: "{{ mail_relay_port }}"
+msmtp_relay_from: "{{ inventory_hostname }}@{{ mail_domain }}"

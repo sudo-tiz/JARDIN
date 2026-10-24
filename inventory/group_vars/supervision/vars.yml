@@ -7,7 +7,7 @@
 
 grafana_enabled: true
 grafana_hostname: "{{ grafana_hostname_label }}"
-grafana_container_http_host_bind_port: 127.0.0.1:8090
+grafana_container_http_host_bind_port: "{{ local_bind }}:8090"
 grafana_default_admin_user: "{{ grafana_default_admin_user_private }}"
 grafana_default_admin_password: "{{ vault_grafana_default_admin_password }}"
 
@@ -77,7 +77,7 @@ prometheus_self_process_scraper_enabled: false
 prometheus_self_node_scraper_enabled: true
 prometheus_self_node_scraper_static_configs_target: "{{ prometheus_node_exporter_identifier }}:9100"
 
-prometheus_container_http_host_bind_port: 127.0.0.1:8091
+prometheus_container_http_host_bind_port: "{{ local_bind }}:8091"
 
 prometheus_config_scrape_configs_additional:
   - job_name: traefik

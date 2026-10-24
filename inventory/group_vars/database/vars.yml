@@ -1,0 +1,11 @@
+---
+########################################################################
+#                                                                      #
+# devture-postgres                                                     #
+#                                                                      #
+########################################################################
+
+postgres_enabled: true
+postgres_connection_password: "{{ vault_postgres_connection_password }}"
+
+

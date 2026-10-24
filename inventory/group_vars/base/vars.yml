@@ -12,6 +12,7 @@ devture_timesync_installation_enabled: false
 ########################################################################
 
 system_security_ssh_enabled: true
+system_security_ssh_port: "{{ ansible_port | default(22) }}"
 system_security_ssh_allow_tcp_forwarding: true
 system_security_ssh_password_authentication: false
 system_security_ssh_permit_root_login: false
@@ -30,15 +31,6 @@ system_security_fail2ban_configuration_extension: |
   filter = sshd[journalmatch='_SYSTEMD_UNIT=ssh.service']
   banaction = %(banaction_allports)s
 
-########################################################################
-#                                                                      #
-# endlessh                                                             #
-#                                                                      #
-########################################################################
-endlessh_enabled: false
-endlessh_container_extra_arguments_custom:
-  - "-enable_prometheus"
-  - "-geoip_supplier=ip-api"
 
 ########################################################################
 #                                                                      #
@@ -49,24 +41,6 @@ endlessh_container_extra_arguments_custom:
 mash_playbook_docker_installation_enabled: true
 devture_docker_sdk_for_python_installation_enabled: true
 # docker_daemon_options: { "metrics-addr": "127.0.0.1:8092" }
-
-########################################################################
-#                                                                      #
-# backup-borg                                                          #
-#                                                                      #
-########################################################################
-
-backup_borg_enabled: true
-backup_borg_systemd_required_services_list:
-  - "docker.service"
-backup_borg_schedule: "*-*-* 05:00:00"
-backup_borg_ssh_key_private: " "
-backup_borg_location_repositories:
-  - /mnt/mash-backup
-backup_borg_container_extra_arguments:
-  - "--mount type=bind,src=/mnt/backup/mash-backup/,dst=/mnt/mash-backup/"
-backup_borg_storage_encryption_passphrase: "{{ vault_backup_borg_storage_encryption_passphrase }}"
-
 ########################################################################
 #                                                                      #
 # devture-traefik                                                      #
@@ -80,22 +54,13 @@ traefik_config_metrics_prometheus_enabled: false
 
 ########################################################################
 #                                                                      #
-# devture-postgres                                                     #
-#                                                                      #
-########################################################################
-
-postgres_enabled: true
-postgres_connection_password: "{{ vault_postgres_connection_password }}"
-
-########################################################################
-#                                                                      #
 # exim_relay                                                           #
 #                                                                      #
 ########################################################################
 
 exim_relay_enabled: true
-exim_relay_hostname: "{{ my_domain }}"
-exim_relay_sender_address: "admin@{{ exim_relay_hostname }}"
+exim_relay_hostname: "{{ mail_domain }}"
+exim_relay_sender_address: "admin@{{ mail_domain }}"
 # NOTE:
 # exim_relay_relay_use: true
 # exim_relay_relay_host_name: "{{ exim_relay_relay_host_name_private }}"
@@ -105,4 +70,10 @@ exim_relay_sender_address: "admin@{{ exim_relay_hostname }}"
 # exim_relay_relay_auth_password: "{{ vault_exim_relay_relay_auth_password }}"
 
 exim_relay_container_extra_arguments:
-  - '-p 127.0.0.1:25:8025'
+  - '-p {{ mail_relay_host }}:{{ mail_relay_port }}:8025'
+
+mail_domain: "{{ my_domain }}"
+mail_relay_host: 127.0.0.1
+mail_relay_port: 25
+local_bind: 127.0.0.1
+
