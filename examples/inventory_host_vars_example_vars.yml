@@ -26,10 +26,10 @@ grafana_default_admin_user_private: admin
 wg_easy_init_username_private: admin
 forgejo_ssh_port_private: 2222
 
-fast_linux_config_users:
+larbuste_users:
   - example-user
   - root
-fast_linux_config_version: d3aef251e1d1d5ad5078e273d17a03f870001ebf
+larbuste_version: d3aef251e1d1d5ad5078e273d17a03f870001ebf
 msmtp_relay_from: server@example.invalid
 system_mail_recipient: admin@example.invalid
 fstab_mounts_entries:

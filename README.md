@@ -1,4 +1,4 @@
-# Server playbooks
+# JARDIN
 
 ![Ansible](https://img.shields.io/badge/Ansible-EE0000?logo=ansible&logoColor=white)
 ![just](https://img.shields.io/badge/just-task_runner-orange)
@@ -7,7 +7,7 @@
 Ansible setup for a small self-hosted server, driven by one `justfile` and one shared inventory.
 
 ```
-server                     just + shared inventory
+JARDIN                     just + shared inventory
  ├─ mash-playbook            services: Docker, Traefik, PostgreSQL, borg…
  └─ math-playbook            host setup, firewall, mail relay, APT, KVM VMs
 ```
@@ -44,7 +44,7 @@ Both are Git submodules.
 Requires `just`, the Ansible community package and `uv`.
 
 ```sh
-git clone --recurse-submodules <url> && cd server
+git clone --recurse-submodules <url> && cd JARDIN
 cp examples/inventory_hosts inventory/hosts
 mkdir -p inventory/host_vars/<host>
 cp examples/inventory_host_vars_example_vars.yml inventory/host_vars/<host>/vars.yml
