@@ -10,3 +10,4 @@
 # Local Vault files
 **/vault.yml
 **/vault.yaml
+*.bkp
