@@ -27,7 +27,7 @@ wg_easy_init_username_private: admin
 forgejo_ssh_port_private: 2222
 
 larbuste_users:
-  - example-user
+  - name: example-user
 larbuste_version: d3aef251e1d1d5ad5078e273d17a03f870001ebf
 msmtp_relay_from: server@example.invalid
 system_mail_recipient: admin@example.invalid
