@@ -69,7 +69,7 @@ sonarr_container_additional_volumes:
 #                                                                      #
 ########################################################################
 radarr_enabled: true
-radarr_container_http_bind_port: 127.0.0.1:8083
+radarr_container_http_host_bind_port: 127.0.0.1:8083
 radarr_container_labels_traefik_enabled: false
 radarr_hostname: "{{ radarr_hostname_label }}.{{ media_domain }}"
 radarr_container_additional_volumes:

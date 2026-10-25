@@ -8,12 +8,17 @@ sync-inventory:
     set -eu
     root="{{ justfile_directory() }}"
     mkdir -p "$root/mash-playbook/inventory/host_vars" "$root/mash-playbook/group_vars"
+    # TODO remove: mash-playbook/inventory/group_vars is only read by MASH's optimize.py (it ignores the
+    # playbook-root group_vars/). Drop it once optimize reads the playbook's group_vars/ (or takes an extra path).
+    mkdir -p "$root/mash-playbook/inventory/group_vars"
     mkdir -p "$root/math-playbook/inventory/host_vars" "$root/math-playbook/inventory/group_vars"
     cp -a "$root/inventory/hosts" "$root/mash-playbook/inventory/hosts"
     cp -a "$root/inventory/hosts" "$root/math-playbook/inventory/hosts"
     cp -a "$root/inventory/host_vars/." "$root/mash-playbook/inventory/host_vars/"
     cp -a "$root/inventory/host_vars/." "$root/math-playbook/inventory/host_vars/"
     cp -a "$root/inventory/group_vars/." "$root/mash-playbook/group_vars/"
+    # TODO remove with the mkdir above (optimize workaround)
+    cp -a "$root/inventory/group_vars/." "$root/mash-playbook/inventory/group_vars/"
     cp -a "$root/inventory/group_vars/." "$root/math-playbook/inventory/group_vars/"
 
 mash-install-all *args: sync-inventory
