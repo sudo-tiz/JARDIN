@@ -41,7 +41,7 @@ Both are Git submodules.
 
 ## Quick start
 
-Requires `just`, the Ansible community package and `uv`.
+Requires `just` and the Ansible community package.
 
 ```sh
 git clone --recurse-submodules <url> && cd JARDIN

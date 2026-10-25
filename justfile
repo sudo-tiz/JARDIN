@@ -34,23 +34,6 @@ periodic-update: sync-inventory
     cd {{ justfile_directory() }}/math-playbook && just full-upgrade --extra-vars=apt_full_upgrade_reboot_if_required=true
     just --justfile {{ justfile() }} mash-upgrade
 
-_check-uv:
-    #!/usr/bin/env sh
-    command -v uv >/dev/null && exit 0
-    echo "uv is required by mash-optimize (it provides the Python 'regex' module)." >&2
-    echo "Install it: curl -LsSf https://astral.sh/uv/install.sh | sh" >&2
-    echo "or use your package manager (e.g. 'pacman -S uv', 'brew install uv')." >&2
-    exit 1
-
-mash-optimize: _check-uv sync-inventory
-    #!/usr/bin/env sh
-    set -eu
-    cd {{ justfile_directory() }}/mash-playbook
-    uv run --with regex --with pyyaml -- just _optimize-for-var-paths $(find inventory/host_vars group_vars -name vars.yml -exec readlink -f {} \;)
-
-mash-optimize-reset:
-    cd {{ justfile_directory() }}/mash-playbook && just optimize-reset
-
 math-bootstrap host="math_servers" *args: sync-inventory
     cd {{ justfile_directory() }}/math-playbook && just bootstrap --limit {{ host }} {{ args }}
 

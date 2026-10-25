@@ -10,16 +10,11 @@ jellyfin_enabled: true
 jellyfin_uid: "0"
 jellyfin_gid: "0"
 jellyfin_hostname: "{{ jellyfin_hostname_label }}.{{ media_domain }}"
-# Optional custom Traefik rules can reference jellyfin_hostname.
 jellyfin_container_additional_volumes:
   - type: bind
     src: "{{ media_path }}"
     dst: /media
-
-# No basic auth
 jellyfin_container_labels_traefik_middleware_basic_auth_enabled: false
-
-# Hardware acceleration
 jellyfin_gpu_path: "/dev/dri"
 jellyfin_gpu_bind_path: "{{ jellyfin_gpu_path }}"
 
@@ -74,8 +69,8 @@ sonarr_container_additional_volumes:
 #                                                                      #
 ########################################################################
 radarr_enabled: true
-# radarr_container_http_bind_port: 127.0.0.1:8083
-# radarr_container_labels_traefik_enabled: false
+radarr_container_http_bind_port: 127.0.0.1:8083
+radarr_container_labels_traefik_enabled: false
 radarr_hostname: "{{ radarr_hostname_label }}.{{ media_domain }}"
 radarr_container_additional_volumes:
   - type: bind
@@ -91,7 +86,7 @@ radarr_container_additional_volumes:
 #                                                                      #
 ########################################################################
 bazarr_enabled: true
-bazarr_hostname: "{{ bazarr_hostname_label }}"
+bazarr_hostname: "{{ bazarr_hostname_label }}.{{ media_domain }}"
 bazarr_container_http_host_bind_port: "{{ local_bind }}:8087" # to change
 bazarr_container_labels_traefik_enabled: false
 bazarr_container_additional_volumes_custom:
@@ -114,8 +109,6 @@ bazarr_container_additional_networks_custom:
 ########################################################################
 lidarr_enabled: false
 lidarr_hostname: "{{ lidarr_hostname_label }}.{{ media_domain }}"
-# lidarr_container_http_host_bind_port: "{{ local_bind }}:8088"
-# lidarr_container_labels_traefik_enabled: false
 lidarr_container_additional_volumes_custom:
   - type: bind
     src: "{{ lidarr_music_path_private }}"
@@ -133,7 +126,7 @@ lidarr_container_additional_volumes_custom:
 
 qbittorrent_enabled: true
 qbittorrent_container_http_host_bind_port: "{{ local_bind }}:8085"
-qbittorrent_hostname: "{{ qbittorrent_hostname_label }}"
+qbittorrent_hostname: "{{ qbittorrent_hostname_label }}.{{ media_domain }}"
 qbittorrent_container_labels_traefik_enabled: false
 qbittorrent_download_path: "{{ qbittorrent_base_path }}/downloads"
 qbittorrent_container_additional_volumes:

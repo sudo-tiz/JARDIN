@@ -61,7 +61,6 @@ traefik_config_metrics_prometheus_enabled: false
 exim_relay_enabled: true
 exim_relay_hostname: "{{ mail_domain }}"
 exim_relay_sender_address: "admin@{{ mail_domain }}"
-# NOTE:
 # exim_relay_relay_use: true
 # exim_relay_relay_host_name: "{{ exim_relay_relay_host_name_private }}"
 # exim_relay_relay_host_port: 465

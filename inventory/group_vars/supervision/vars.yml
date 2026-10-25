@@ -4,7 +4,6 @@
 # grafana                                                              #
 #                                                                      #
 ########################################################################
-
 grafana_enabled: true
 grafana_hostname: "{{ grafana_hostname_label }}"
 grafana_container_http_host_bind_port: "{{ local_bind }}:8090"
@@ -70,7 +69,6 @@ grafana_hsts_preload_enabled: true
 ########################################################################
 
 prometheus_enabled: true
-# scrape itself
 prometheus_self_process_scraper_enabled: false
 
 # node-exporter
