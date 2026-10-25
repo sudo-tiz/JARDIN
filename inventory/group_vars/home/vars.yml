@@ -52,6 +52,7 @@ vaultwarden_hsts_preload_enabled: true
 vaultwarden_config_admin_token: "{{ vault_vaultwarden_config_admin_token }}"
 vaultwarden_config_signups_verify: true
 vaultwarden_environment_variables_smtp_from: "vaultwarden@{{ exim_relay_hostname }}"
+vaultwarden_database_type: "postgres"
 
 ########################################################################
 #                                                                      #
