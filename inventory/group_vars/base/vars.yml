@@ -16,6 +16,7 @@ system_security_ssh_port: "{{ ansible_port | default(22) }}"
 system_security_ssh_allow_tcp_forwarding: true
 system_security_ssh_password_authentication: false
 system_security_ssh_permit_root_login: false
+system_security_ssh_print_last_log: false
 
 ########################################################################
 #                                                                      #
