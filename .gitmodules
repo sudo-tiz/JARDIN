@@ -1,6 +1,6 @@
 [submodule "mash-playbook"]
 	path = mash-playbook
-	url = git@github.com:mother-of-all-self-hosting/mash-playbook.git
+	url = https://github.com/mother-of-all-self-hosting/mash-playbook.git
 [submodule "math-playbook"]
 	path = math-playbook
-	url = git@github.com:sudo-tiz/math-playbook.git
+	url = https://github.com/sudo-tiz/math-playbook.git
