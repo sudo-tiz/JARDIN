@@ -25,7 +25,14 @@ mash-adjust-nextcloud-config *args: sync-inventory
 mash-run-tags tags *args: sync-inventory
     cd {{ justfile_directory() }}/mash-playbook && just run-tags {{ tags }} {{ args }}
 
+update *args: math-update (mash-update args)
+
+math-update:
+    git -C {{ justfile_directory() }}/math-playbook checkout -q main
+    git -C {{ justfile_directory() }}/math-playbook pull -q --ff-only
+
 mash-update *args:
+    git -C {{ justfile_directory() }}/mash-playbook checkout -q main
     cd {{ justfile_directory() }}/mash-playbook && just update {{ args }}
 
 mash-upgrade: mash-update mash-install-all mash-adjust-nextcloud-config
