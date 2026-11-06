@@ -1,14 +1,23 @@
+media_domain: "media.{{ my_domain }}"
+vm_public_hostnames: >-
+  {{
+    ([jellyfin_hostname] if jellyfin_enabled | default(false) else [])
+    + ([seerr_hostname] if seerr_enabled | default(false) else [])
+    + ([sonarr_hostname] if sonarr_enabled | default(false) else [])
+    + ([radarr_hostname] if radarr_enabled | default(false) else [])
+    + ([lidarr_hostname] if lidarr_enabled | default(false) else [])
+  }}
+
 ########################################################################
 #                                                                      #
 # jellyfin                                                             #
 #                                                                      #
 ########################################################################
-media_domain: "media.{{ my_domain }}"
-vm_public_hostnames: "{{ [jellyfin_hostname, seerr_hostname, sonarr_hostname, radarr_hostname] + ([lidarr_hostname] if lidarr_enabled else []) }}"
-
 jellyfin_enabled: true
-jellyfin_uid: "0"
-jellyfin_gid: "0"
+jellyfin_uid: "{{ mash_playbook_uid }}"
+jellyfin_gid: "{{ mash_playbook_gid }}"
+jellyfin_container_extra_arguments_custom:
+  - "--user=0:0"  
 jellyfin_hostname: "{{ jellyfin_hostname_label }}.{{ media_domain }}"
 jellyfin_container_additional_volumes:
   - type: bind
