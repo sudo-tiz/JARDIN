@@ -1,76 +1,69 @@
-export ANSIBLE_VAULT_PASSWORD_FILE := justfile_directory() + "/vault_pass"
+mash := justfile_directory() / "mash-playbook"
+math := justfile_directory() / "math-playbook"
+vault_file := env("ANSIBLE_VAULT_PASSWORD_FILE", justfile_directory() / "vault_pass")
+
+export ANSIBLE_VAULT_PASSWORD_FILE := vault_file
 
 default:
     @just --list
 
-sync-inventory:
+_check-vault:
+    @[ -f "{{ vault_file }}" ] || { echo "No vault password: set ANSIBLE_VAULT_PASSWORD_FILE (file or script) or create vault_pass" >&2; exit 1; }
+
+sync-inventory: _check-vault
     #!/usr/bin/env sh
     set -eu
-    root="{{ justfile_directory() }}"
-    mkdir -p "$root/mash-playbook/inventory/host_vars" "$root/mash-playbook/group_vars"
-    mkdir -p "$root/math-playbook/inventory/host_vars" "$root/math-playbook/inventory/group_vars"
-    cp -a "$root/inventory/hosts" "$root/mash-playbook/inventory/hosts"
-    cp -a "$root/inventory/hosts" "$root/math-playbook/inventory/hosts"
-    cp -a "$root/inventory/host_vars/." "$root/mash-playbook/inventory/host_vars/"
-    cp -a "$root/inventory/host_vars/." "$root/math-playbook/inventory/host_vars/"
-    cp -a "$root/inventory/group_vars/." "$root/mash-playbook/group_vars/"
-    cp -a "$root/inventory/group_vars/." "$root/math-playbook/group_vars/"
-
-mash-install-all *args: sync-inventory
-    cd {{ justfile_directory() }}/mash-playbook && just install-all {{ args }}
-
-mash-adjust-nextcloud-config *args: sync-inventory
-    cd {{ justfile_directory() }}/mash-playbook && just run-tags adjust-nextcloud-config {{ args }}
-
-mash-run-tags tags *args: sync-inventory
-    cd {{ justfile_directory() }}/mash-playbook && just run-tags {{ tags }} {{ args }}
+    for pb in "{{ mash }}" "{{ math }}"; do
+        mkdir -p "$pb/inventory/host_vars" "$pb/group_vars"
+        cp -a inventory/hosts "$pb/inventory/hosts"
+        cp -a inventory/host_vars/. "$pb/inventory/host_vars/"
+        cp -a inventory/group_vars/. "$pb/group_vars/"
+    done
 
 update *args: math-update (mash-update args)
 
+[working-directory: math]
 math-update:
-    git -C {{ justfile_directory() }}/math-playbook checkout -q main
-    git -C {{ justfile_directory() }}/math-playbook pull -q --ff-only
+    git checkout -q main
+    git pull -q --ff-only
 
+[working-directory: mash]
 mash-update *args:
-    git -C {{ justfile_directory() }}/mash-playbook checkout -q main
-    cd {{ justfile_directory() }}/mash-playbook && just update {{ args }}
+    git checkout -q main
+    just update {{ args }}
+
+periodic-update: (math-full-upgrade "math_servers" "--extra-vars=apt_full_upgrade_reboot_if_required=true") mash-upgrade
 
 mash-upgrade: mash-update mash-install-all mash-adjust-nextcloud-config
 
-periodic-update: sync-inventory
-    cd {{ justfile_directory() }}/math-playbook && just full-upgrade --extra-vars=apt_full_upgrade_reboot_if_required=true
-    just --justfile {{ justfile() }} mash-upgrade
+mash-install-all *args: (mash-run-tags "install-all" args)
+mash-adjust-nextcloud-config *args: (mash-run-tags "adjust-nextcloud-config" args)
 
-math-bootstrap host="math_servers" *args: sync-inventory
-    cd {{ justfile_directory() }}/math-playbook && just bootstrap --limit {{ host }} {{ args }}
+[working-directory: mash]
+mash-run-tags tags *args: sync-inventory
+    just run-tags {{ tags }} {{ args }}
 
-math-full-upgrade host="math_servers" *args: sync-inventory
-    cd {{ justfile_directory() }}/math-playbook && just full-upgrade --limit {{ host }} {{ args }}
+math-bootstrap host="math_servers" *args: (_math "bootstrap" "--limit" host args)
+math-full-upgrade host="math_servers" *args: (_math "full-upgrade" "--limit" host args)
+math-reboot *args: (_math "reboot" args)
+math-run-tags tags *args: (_math "run-tags" tags args)
+math-create-vms vm="" *args: (_math "create-vms" quote(vm) args)
 
-math-reboot *args: sync-inventory
-    cd {{ justfile_directory() }}/math-playbook && just reboot {{ args }}
+[working-directory: math]
+_math recipe *args: sync-inventory
+    just {{ recipe }} {{ args }}
 
-math-run-tags tags *args: sync-inventory
-    cd {{ justfile_directory() }}/math-playbook && just run-tags {{ tags }} {{ args }}
+list-tags: mash-list-tags math-list-tags
+mash-list-tags: sync-inventory _mash-prepare (_list-tags mash)
+math-list-tags: sync-inventory (_list-tags math)
 
-math-create-vms vm="" *args: sync-inventory
-    cd {{ justfile_directory() }}/math-playbook && just create-vms "{{ vm }}" {{ args }}
-
-math-list-tags: sync-inventory (_list-tags "math-playbook")
-
-mash-list-tags: sync-inventory
-    cd {{ justfile_directory() }}/mash-playbook && just _prepare-files
-    just --justfile {{ justfile() }} _list-tags mash-playbook
+[working-directory: mash]
+_mash-prepare:
+    just _prepare-files
 
 _list-tags playbook:
     #!/usr/bin/env sh
     set -eu
-    cd {{ justfile_directory() }}/{{ playbook }}
+    cd {{ playbook }}
     ansible-playbook -i "${ANSIBLE_INVENTORY:-inventory/hosts}" setup.yml --list-tags 2>/dev/null \
       | sed -n 's/.*TASK TAGS: \[\(.*\)\]/\1/p' | tr ',' '\n' | sed 's/^ *//' | sort -u | sed 's/^/  /'
-
-list-tags:
-    @echo "mash:"
-    @just --justfile {{ justfile() }} mash-list-tags
-    @echo "math:"
-    @just --justfile {{ justfile() }} math-list-tags
