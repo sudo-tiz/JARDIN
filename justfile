@@ -59,7 +59,7 @@ math-create-vms vm="" *args: sync-inventory
 math-list-tags: sync-inventory (_list-tags "math-playbook")
 
 mash-list-tags: sync-inventory
-    cd {{ justfile_directory() }}/mash-playbook && just _setup-yml
+    cd {{ justfile_directory() }}/mash-playbook && just _prepare-files
     just --justfile {{ justfile() }} _list-tags mash-playbook
 
 _list-tags playbook:
