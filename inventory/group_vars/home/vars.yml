@@ -11,6 +11,21 @@ nextcloud_database_type: "postgres"
 nextcloud_floc_optout_enabled: false
 nextcloud_hsts_preload_enabled: true
 nextcloud_app_autoupdate_enabled: true
+nextcloud_apps_to_install_custom: 
+  - calendar
+  - contacts
+  - memories
+  - notes
+  - phonetrack
+  - previewgenerator
+  - richdocuments
+  - tasks
+  # shipped 
+  - admin_audit
+  - bruteforcesettings
+  - photos
+  - privacy
+  - suspicious_login
 nextcloud_preview_enabled: true
 nextcloud_preview_preview_max_x: 2560
 nextcloud_preview_preview_max_y: 2560
