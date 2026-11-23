@@ -24,13 +24,8 @@ system_security_ssh_print_last_log: false
 #                                                                      #
 ########################################################################
 
-system_security_fail2ban_enabled: true
-system_security_fail2ban_sshd_port: "{{ system_security_ssh_port }}"
-#NOTE: some are missing and some of them are send by aux role: vaultwarden
-system_security_fail2ban_configuration_extension: |
-  backend = systemd
-  filter = sshd[journalmatch='_SYSTEMD_UNIT=ssh.service']
-  banaction = %(banaction_allports)s
+# Fail2Ban is managed by math-playbook.
+system_security_fail2ban_enabled: false
 
 
 ########################################################################
@@ -51,6 +46,10 @@ devture_docker_sdk_for_python_installation_enabled: true
 mash_playbook_reverse_proxy_type: playbook-managed-traefik
 traefik_config_certificatesResolvers_acme_enabled: true
 traefik_config_metrics_prometheus_enabled: false
+traefik_config_accessLog_enabled: true
+# Traefik's extended common format includes User-Agent; disable buffering for timely bans.
+traefik_config_accessLog_format: common
+traefik_config_accessLog_bufferingSize: 0
 # traefik_config_entrypoint_metrics_port: 9082
 
 ########################################################################
@@ -76,4 +75,3 @@ mail_domain: "{{ my_domain }}"
 mail_relay_host: 127.0.0.1
 mail_relay_port: 25
 local_bind: 127.0.0.1
-

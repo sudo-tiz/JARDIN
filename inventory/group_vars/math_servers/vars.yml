@@ -8,3 +8,35 @@ system_mail_recipient: ""
 msmtp_relay_host: "{{ mail_relay_host }}"
 msmtp_relay_port: "{{ mail_relay_port }}"
 msmtp_relay_from: "{{ inventory_hostname }}@{{ mail_domain }}"
+
+math_fail2ban_sshd_port: "{{ system_security_ssh_port }}"
+math_fail2ban_vaultwarden_enabled: true
+math_fail2ban_vaultwarden_journalmatch: _SYSTEMD_UNIT=mash-vaultwarden.service
+math_fail2ban_traefik_enabled: true
+math_fail2ban_traefik_journalmatch: _SYSTEMD_UNIT=mash-traefik.service
+# App jails ignore private proxy/container addresses; configure each app's trusted proxy setting to expose client IPs.
+math_fail2ban_service_jails:
+  - name: nextcloud
+    enabled: true
+    journalmatch: "_SYSTEMD_UNIT=mash-nextcloud-logger.service + _SYSTEMD_UNIT=mash-nextcloud-server.service"
+  - name: radarr
+    enabled: true
+    journalmatch: _SYSTEMD_UNIT=mash-radarr.service
+  - name: sonarr
+    enabled: true
+    journalmatch: _SYSTEMD_UNIT=mash-sonarr.service
+  - name: lidarr
+    enabled: true
+    journalmatch: _SYSTEMD_UNIT=mash-lidarr.service
+  - name: prowlarr
+    enabled: true
+    journalmatch: _SYSTEMD_UNIT=mash-prowlarr.service
+  - name: jellyfin
+    enabled: true
+    journalmatch: _SYSTEMD_UNIT=mash-jellyfin.service
+  - name: seerr
+    enabled: true
+    journalmatch: _SYSTEMD_UNIT=mash-seerr.service
+  - name: qbittorrent
+    enabled: true
+    journalmatch: _SYSTEMD_UNIT=mash-qbittorrent.service
