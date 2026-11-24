@@ -50,6 +50,13 @@ traefik_config_accessLog_enabled: true
 # Traefik's extended common format includes User-Agent; disable buffering for timely bans.
 traefik_config_accessLog_format: common
 traefik_config_accessLog_bufferingSize: 0
+traefik_configuration_extension_yaml: |
+  accessLog:
+    fields:
+      headers:
+        defaultMode: drop
+        names:
+          User-Agent: keep
 # traefik_config_entrypoint_metrics_port: 9082
 
 ########################################################################

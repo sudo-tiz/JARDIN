@@ -40,3 +40,7 @@ math_fail2ban_service_jails:
   - name: qbittorrent
     enabled: true
     journalmatch: _SYSTEMD_UNIT=mash-qbittorrent.service
+
+# Remove stale Docker resources daily through MASH's cleanup component.
+system_cleanup_docker: true
+system_cleanup_docker_timer_enabled: true
