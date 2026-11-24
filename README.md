@@ -67,6 +67,10 @@ just periodic-update
 > [!WARNING]
 > Playbooks change real machines: use `--check` and `--limit` first.
 
+## Post-installation
+
+Some services need manual first-run setup, including Nextcloud's configuration adjustment, trusted proxy settings for client IP logging, and qBittorrent's initial password and download-client setup. See the [post-installation guide](docs/manual-actions.md).
+
 ## Related
 
 - [math-playbook](https://github.com/sudo-Tiz/math-playbook) — roles for what MASH doesn't cover
