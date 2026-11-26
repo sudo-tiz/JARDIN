@@ -54,16 +54,17 @@ _math recipe *args: sync-inventory
     just {{ recipe }} {{ args }}
 
 list-tags: mash-list-tags math-list-tags
-mash-list-tags: sync-inventory _mash-prepare (_list-tags mash)
-math-list-tags: sync-inventory (_list-tags math)
+mash-list-tags: sync-inventory _mash-prepare (_list-tags mash "MASH")
+math-list-tags: sync-inventory (_list-tags math "MATH")
 
 [working-directory: mash]
 _mash-prepare:
     just _prepare-files
 
-_list-tags playbook:
+_list-tags playbook source:
     #!/usr/bin/env sh
     set -eu
     cd {{ playbook }}
+    printf '\n%s\n' '{{ source }}'
     ansible-playbook -i "${ANSIBLE_INVENTORY:-inventory/hosts}" setup.yml --list-tags 2>/dev/null \
-      | sed -n 's/.*TASK TAGS: \[\(.*\)\]/\1/p' | tr ',' '\n' | sed 's/^ *//' | sort -u | sed 's/^/  /'
+      | sed -n 's/.*TASK TAGS: \[\(.*\)\]/\1/p' | tr ',' '\n' | sed 's/^ *//' | sort -u | sed 's/^/  • /'
